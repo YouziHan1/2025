@@ -173,7 +173,7 @@ void sm4_crypt_simd(uint8_t* output, const uint8_t* input, const uint32_t* rk, i
     swap(Block[0], Block[3]);
     swap(Block[1], Block[2]);
     
-    // 字节序反转 (LE to BE for output)
+    // 字节序反转
     Block[0] = _mm_shuffle_epi8(Block[0], BSWAP_MASK);
     Block[1] = _mm_shuffle_epi8(Block[1], BSWAP_MASK);
     Block[2] = _mm_shuffle_epi8(Block[2], BSWAP_MASK);
