@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <algorithm>
 #include <iomanip>
-
+#include <chrono>
 using namespace std;
 
 // S盒
@@ -351,12 +351,18 @@ int main() {
     vector<uint8_t> key = hex_to_bytes(key_hex);
     vector<uint8_t> plaintext = hex_to_bytes(plaintext_hex);
 
+    
     cout<<"SM4_Table"<<endl;
     print_hex("Key:", key);
     print_hex("Plaintext:", plaintext);
 
     // 加密
+    auto start_time = std::chrono::high_resolution_clock::now();
     vector<uint8_t> ciphertext = sm4_encrypt(plaintext, key);
+    auto end_time = std::chrono::high_resolution_clock::now();
+    auto duration_us = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
+    std::cout << "Encode_Totaltime: " << duration_us.count() << " us" << std::endl;
+
     cout<<"Encode: "<<endl;
     print_hex("Cipher: ", ciphertext);
     cout << "Expected_Cipher:" << expected_ciphertext_hex << endl;
@@ -366,7 +372,6 @@ int main() {
     cout<<"Decode: "<<endl;
     vector<uint8_t> decrypted_text = sm4_decrypt(ciphertext, key);
     print_hex("Decode_Plaintext: ", decrypted_text);
-
-
+    
     return 0;
 }
