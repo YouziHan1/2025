@@ -9,5 +9,5 @@
 
 
 ## 实验结果
-![实验结果](C:\Users\Savannah\Desktop\2025Creat\2025Creat\PROJECT2\pic\屏幕截图 2025-07-08 150058.png)
+![实验结果](.\pic\屏幕截图 2025-07-08 150058.png)
 
