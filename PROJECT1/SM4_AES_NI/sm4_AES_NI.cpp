@@ -1,3 +1,6 @@
+//g++ -O3 -maes -mssse3 -o sm4_AES_NI.exe sm4_AES_NI.cpp
+//./sm4_AES_NI.exe
+
 #include <iostream>
 #include <vector>
 #include <cstdint>
@@ -233,7 +236,7 @@ int main() {
     sm4_crypt_simd(ciphertext_vec.data(), plaintext_vec.data(), rk.data(), 1); // enc=1
     auto end_time = std::chrono::high_resolution_clock::now();
     auto duration_us = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
-    std::cout << "Encode_Totaltime: " << duration_us.count() << " us" << std::endl;
+    std::cout << "Encode_Totaltime: " << duration_us.count()/4 << " us" << std::endl;
     print_hex("Ciphertext: ", ciphertext_vec.data(), 16);
     cout << "Expected_Ciphertext: " << expected_ciphertext_hex_single << endl;
 
