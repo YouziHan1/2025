@@ -70,32 +70,26 @@ vector<uint8_t> sm3_hash_vec(const vector<uint8_t>& message) {
     return sm3_hash(message.data(), message.size());
 }
 
-// ##################################################################
-// #                  Merkle Tree 实现及辅助函数                    #
-// ##################################################################
 void print_hash(const string& label, const vector<uint8_t>& hash) {
     cout << label;
     for (uint8_t byte : hash) cout << hex << setw(2) << setfill('0') << static_cast<int>(byte);
     cout << dec << endl;
 }
 
-// ##################################################################
-// #             请用这个【修正后】的 MerkleTree 类替换旧版本         #
-// ##################################################################
 class MerkleTree {
 private:
     vector<vector<uint8_t>> leaves;
     vector<vector<vector<uint8_t>>> levels; // 存储每一层的哈希值
     vector<uint8_t> root;
 
-    // RFC6962 叶子哈希
+    //叶子哈希
     vector<uint8_t> hash_leaf(const vector<uint8_t>& data) {
         vector<uint8_t> prefixed_data = {0x00};
         prefixed_data.insert(prefixed_data.end(), data.begin(), data.end());
         return sm3_hash_vec(prefixed_data);
     }
 
-    // RFC6962 内部节点哈希
+    //内部节点哈希
     vector<uint8_t> hash_internal_node(const vector<uint8_t>& left, const vector<uint8_t>& right) {
         vector<uint8_t> prefixed_data = {0x01};
         prefixed_data.insert(prefixed_data.end(), left.begin(), left.end());
@@ -104,14 +98,14 @@ private:
     }
 
 public:
-    // 构造函数，接收原始叶子数据并构建树
+    //构建树
     MerkleTree(const vector<vector<uint8_t>>& initial_leaves) : leaves(initial_leaves) {
         if (leaves.empty()) {
             root = sm3_hash_vec({}); // 空树的根哈希
             return;
         }
 
-        // 计算第一层（叶子哈希层）
+        // 计算第一层
         vector<vector<uint8_t>> current_level;
         for (const auto& leaf : leaves) {
             current_level.push_back(hash_leaf(leaf));
@@ -139,7 +133,6 @@ public:
         return root;
     }
     
-    // ========================[ BUG 已修正 ]========================
     // 生成存在性证明
     vector<vector<uint8_t>> generateInclusionProof(size_t leaf_index) const {
         if (leaf_index >= leaves.size()) {
@@ -165,9 +158,8 @@ public:
         }
         return proof;
     }
-    // =============================================================
 
-    // 静态方法：验证存在性证明 (此函数无需修改)
+    //存在性证明
     static bool verifyInclusionProof(const vector<uint8_t>& leaf_data, size_t leaf_index, const vector<vector<uint8_t>>& proof, const vector<uint8_t>& root_hash) {
         vector<uint8_t> prefixed_leaf = {0x00};
         prefixed_leaf.insert(prefixed_leaf.end(), leaf_data.begin(), leaf_data.end());
@@ -205,7 +197,7 @@ int main() {
     // 对叶子数据排序
     sort(leaves_data.begin(), leaves_data.end());
 
-    // 3. 构建 Merkle 树
+    //构建 Merkle 树
     cout << "构建 Merkle 树：" << endl;
     MerkleTree tree(leaves_data);
     const auto& root_hash = tree.getRoot();
@@ -238,8 +230,7 @@ int main() {
     vector<uint8_t> non_existent_leaf_data(non_existent_leaf_str.begin(), non_existent_leaf_str.end());
     cout << non_existent_leaf_str<< "不存在性证明：" << endl;
     
-    // 逻辑：在排好序的叶子中，找到这个不存在的元素若存在则应该在的位置
-    // 然后，我们为该位置的元素提供一个存在性证明
+    // 在排好序的叶子中，找到这个不存在的元素若存在则应该在的位置，为该位置的元素提供一个存在性证明
     // 如果证明成功，就说明那个位置已经被占了，从而证明目标元素不存在
     auto non_existent_it = lower_bound(leaves_data.begin(), leaves_data.end(), non_existent_leaf_data);
     size_t proof_for_index = distance(leaves_data.begin(), non_existent_it);
