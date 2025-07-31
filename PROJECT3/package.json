@@ -1,0 +1,14 @@
+{
+  "name": "poseidon2-circuit",
+  "version": "1.0.0",
+  "description": "Poseidon2 Hash Circuit Implementation",
+  "main": "verify.js",
+  "scripts": {
+    "compile": "bash compile.sh",
+    "test": "bash run.sh"
+  },
+  "dependencies": {
+    "snarkjs": "^0.7.0",
+    "circomlib": "^2.0.5"
+  }
+}
