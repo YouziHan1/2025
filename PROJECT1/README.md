@@ -9,11 +9,6 @@
   - 最新指令集GFNI、VPROLD等
 - 在此基础上实现并优化 SM4-GCM 工作模式
 
-对应目录：
-- `SM4_initial/sm4.cpp`：标量参考实现与自测
-- `SM4_table/sm4_Table.cpp`：查表优化实现
-- `SM4_AES_NI/sm4_AES_NI.cpp`：利用 AES-NI/SSSE3 的同构映射优化（含多块并行）
-- `SM4_GCM/`：SM4-GCM实现
 
 ## 实验原理
 ### SM4 分组密码简述
