@@ -72,8 +72,6 @@ vector<uint32_t> generate_round_keys(const vector<uint8_t>& master_key) {
 }
 
 
-// --- SIMD优化部分 ---
-
 
 #define XOR4(a,b,c,d) _mm_xor_si128(_mm_xor_si128(a,b), _mm_xor_si128(c,d))
 #define XOR6(a,b,c,d,e,f) _mm_xor_si128(XOR4(a,b,c,d), _mm_xor_si128(e,f))
@@ -231,19 +229,23 @@ int main() {
     print_hex("Plaintext: ", hex_to_bytes(plaintext_hex_single).data(), 16);
     cout << "--------------------------------------------------" << endl;
 
-    // 加密 (处理4个块)
-    auto start_time = std::chrono::high_resolution_clock::now();
+    // 加密
+    auto start_time = chrono::high_resolution_clock::now();
     sm4_crypt_simd(ciphertext_vec.data(), plaintext_vec.data(), rk.data(), 1); // enc=1
-    auto end_time = std::chrono::high_resolution_clock::now();
-    auto duration_us = std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time);
-    std::cout << "Encode_Totaltime: " << duration_us.count()/4 << " us" << std::endl;
+    auto end_time = chrono::high_resolution_clock::now();
+    auto encode_ns = chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count();
+    cout << "Encode_Totaltime: " << encode_ns/4 << " ns" << endl;
     print_hex("Ciphertext: ", ciphertext_vec.data(), 16);
     cout << "Expected_Ciphertext: " << expected_ciphertext_hex_single << endl;
 
 
 
-    // 解密 (处理4个块)
+    // 解密
+    start_time = chrono::high_resolution_clock::now();
     sm4_crypt_simd(decrypted_vec.data(), ciphertext_vec.data(), rk.data(), 0); // enc=0
+    end_time = chrono::high_resolution_clock::now();
+    auto decode_ns = chrono::duration_cast<chrono::nanoseconds>(end_time - start_time).count();
+    cout << "Decode_Totaltime: " << decode_ns/4 << " ns" << endl;
     print_hex("Decode_Plaintext: ", decrypted_vec.data(), 16);
     
     return 0;

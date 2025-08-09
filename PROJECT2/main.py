@@ -23,11 +23,10 @@ class Watermark:
             sigma_new[i, i] = S_new[i]
             
         coeffs_embedded = U @ sigma_new @ V
-        
         return (coeffs_embedded, original_coeffs[1])
 
     def _extract_dwt_svd(self, watermarked_coeffs, original_coeffs, watermark_LL_original):
-        """核心提取逻辑"""
+        #提取
         U_wm, S_wm, V_wm = np.linalg.svd(watermarked_coeffs[0])
         U_orig, S_orig, V_orig = np.linalg.svd(original_coeffs[0])
         
@@ -50,7 +49,7 @@ class Watermark:
 
 
     def embed(self, original_image_path, watermark_image_path, output_path):
-        """将水印嵌入到原始图像中"""
+        # 水印嵌入
         original_img = cv2.imread(original_image_path, cv2.IMREAD_COLOR)
         h, w, _ = original_img.shape
         original_img_yuv = cv2.cvtColor(original_img, cv2.COLOR_BGR2YUV)
@@ -76,6 +75,7 @@ class Watermark:
         return final_img
 
     def extract(self, watermarked_image_path, original_image_path, original_watermark_path, output_path, extracted_size=(128, 128)):
+        # 水印提取
         original_img = cv2.imread(original_image_path)
         orig_h, orig_w, _ = original_img.shape
         
@@ -88,7 +88,7 @@ class Watermark:
         original_yuv = cv2.cvtColor(original_img, cv2.COLOR_BGR2YUV)
         original_y = original_yuv[:, :, 0]
         
-        original_watermark_img = cv2.imread(original_watermark_path, cv2.IMREAD_GRAYSCALE) # <--- 已改回
+        original_watermark_img = cv2.imread(original_watermark_path, cv2.IMREAD_GRAYSCALE)
         original_watermark_resized = cv2.resize(original_watermark_img, (orig_w // 2, orig_h // 2))
         
         watermarked_coeffs = pywt.dwt2(cv2.cvtColor(watermarked_img, cv2.COLOR_BGR2YUV)[:,:,0], 'haar')
@@ -112,7 +112,7 @@ class Watermark:
         return extracted_watermark
 
 def calculate_nc(img1, img2):
-    """计算两张图片的归一化相关系数"""
+    #计算归一化相关系数
     if img1 is None or img2 is None:
         return 0.0
     
@@ -164,7 +164,6 @@ if __name__ == '__main__':
         )
     }
 
-
     # 创建目录保存攻击图像
     attacked_dir = "attacked_images"
     if not os.path.exists(attacked_dir):
@@ -191,9 +190,6 @@ if __name__ == '__main__':
         )
         
 
-        if extracted_watermark is not None:
-            # 计算NC值
-            nc_score = calculate_nc(original_watermark, extracted_watermark)
-            print(f"攻击类型: {attack_name:<20} | NC值: {nc_score:.4f}")
-        else:
-            print(f"攻击类型: {attack_name:<20} | 水印提取失败!")
+        # 计算NC值
+        nc_score = calculate_nc(original_watermark, extracted_watermark)
+        print(f"攻击类型: {attack_name:<20} | NC值: {nc_score:.4f}")
