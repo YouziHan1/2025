@@ -1,7 +1,7 @@
 # PROJECT1 实验报告：SM4 软件实现与优化、SM4-GCM 优化实现
 
 
-##实验目标
+## 实验目标
 - 基于 SM4 的标准实现，完成多种软件优化：
   - 基础实现
   - T-table 查表优化
@@ -28,8 +28,6 @@
 - T-table：将 S 盒与线性变换融合到 4 张 256×32 位表中，减少每轮的字节级操作与移位异或，降低指令数量与分支。
 - 指令集优化：
   - AES-NI 同构映射：将 SM4 S 盒映射到 AES 域，使用 `_mm_aesenclast_si128` 完成 S 盒，再映回 SM4 域；配合 `_mm_shuffle_epi8`（SSSE3）实现字节洗牌；使用寄存器并行与循环展开。
-  - GFNI/VPROLD：
-    - GFNI 可用于更快捷地描述 GF(2) 上的线性/仿射变换，理论上可进一步简化同构映射步骤。
   - SIMD 多块并行：同时处理 4×128bit 块，提升吞吐。
 
 
@@ -44,17 +42,17 @@
   - 若 IV 长度为 12 字节，`J0 = IV || 0x00000001`；
   - 否则 `J0 = GHASH_H(IV || pad || 64-bit(0) || 64-bit(len(IV)bits))`。
 
-## 实现说明
-### 参考实现（`SM4_initial/sm4.cpp`）
+## 实验过程
+### SM4实现（`sm4.cpp`）
 - 按标准实现 S 盒、FK/CK、T/T' 变换、轮密钥生成与 32 轮加解密。
 - 使用国家标准测试向量验证：
   - Key/Plain: `0123456789abcdeffedcba9876543210`
   - Cipher: `681edf34d206965e86b3e94f536e4246`
 
-### T-table 实现（`SM4_table/sm4_Table.cpp`）
-- 预计算 T 表，将 S 盒与 L 变换融合到表项，轮函数主要变为若干表查与异或，显著减少指令与缓存缺失影响。
+### T-table 实现（`sm4_Table.cpp`）
+- 预计算 T 表，将 S 盒与 L 变换融合到表项，轮函数主要变为若干表查与异或。
 
-### AES-NI实现（`SM4_AES_NI/sm4_AES_NI.cpp`）
+### AES-NI实现（`sm4_AES_NI.cpp`）
 - 通过同构映射把 SM4 S 盒转到 AES 域，调用 `_mm_aesenclast_si128`，再映回；
 - 使用 `_mm_shuffle_epi8` 做字节打散/重排；
 - 4 块并行+循环展开，减少轮间开销；

@@ -28,6 +28,6 @@
 ### 添加水印后的图片
 ![alt text](attacked_images/attacked_no_attack.png)
 ### 提取出的水印
-![实验结果](.\attacked_images\extracted_no_attack.png)
+![alt text](attacked_images/extracted_no_attack.png)
 ### NC值
 ![alt text](<pic/屏幕截图 2025-07-08 150058.png>)
